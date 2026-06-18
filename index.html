@@ -1,0 +1,1296 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RiseVisual Photo Selector</title>
+    <!-- Import Font Inter & Tailwind CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        'custom': '16px',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Gaya Kustom Tambahan */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* Transisi Halaman Halus */
+        .page-view {
+            transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+        }
+        /* Animasi Sentuhan Kartu Foto */
+        .photo-card {
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s ease;
+        }
+        .photo-card:active {
+            transform: scale(0.96);
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-900 font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- CONTAINER UTAMA UNTUK SEMUA HALAMAN (SPA) -->
+    <main class="flex-grow flex flex-col w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        
+        <!-- ============================================ -->
+        <!-- 1. LANDING PAGE VIEW (Halaman Utama) -->
+        <!-- ============================================ -->
+        <section id="view-landing" class="page-view flex flex-col items-center justify-center my-auto py-12 text-center">
+            <!-- Logo Visual Kreatif -->
+            <div class="mb-6 flex items-center justify-center bg-gray-900 text-white w-16 h-16 rounded-2xl shadow-lg">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+            </div>
+            
+            <h1 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                RiseVisual <span class="font-light">Photo Selector</span>
+            </h1>
+            <p class="mt-3 text-base text-gray-500 max-w-md mx-auto">
+                Platform kurasi foto klien graduation paling simpel. Tempel link Google Drive, buat link unik instan, dan pantau progres kurasi klien!
+            </p>
+
+            <div class="mt-10 sm:flex sm:justify-center gap-4 w-full max-w-xs sm:max-w-md">
+                <button onclick="navigateTo('admin')" class="w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-semibold rounded-custom text-white bg-gray-900 hover:bg-gray-800 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-950 mb-3 sm:mb-0">
+                    Masuk Panel Admin (Fotografer)
+                </button>
+                <button id="btn-open-active-gallery" onclick="navigateTo('gallery')" class="w-full flex items-center justify-center px-6 py-3 border border-gray-200 text-base font-medium rounded-custom text-gray-750 bg-white hover:bg-gray-50 shadow-sm transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-100 hidden">
+                    Buka Galeri Aktif
+                </button>
+            </div>
+            
+            <div class="mt-16 border-t border-gray-100 pt-8 w-full max-w-lg">
+                <p class="text-xs text-gray-400 uppercase tracking-widest font-semibold">Alur Kurasi Instan Multi-Klien</p>
+                <div class="grid grid-cols-3 gap-4 mt-4 text-xs text-gray-500">
+                    <div>
+                        <span class="font-bold text-gray-900 block text-lg mb-1">1</span>
+                        Tempel link Drive & generate link unik klien
+                    </div>
+                    <div>
+                        <span class="font-bold text-gray-900 block text-lg mb-1">2</span>
+                        Bagikan link berbeda ke masing-masing klien
+                    </div>
+                    <div>
+                        <span class="font-bold text-gray-900 block text-lg mb-1">3</span>
+                        Pantau progres atau impor hasil seleksi klien
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- 2. ADMIN PORTAL VIEW (Halaman Tempel Link) -->
+        <!-- ============================================ -->
+        <section id="view-admin" class="page-view hidden max-w-3xl mx-auto w-full py-6">
+            <div class="flex items-center gap-3 mb-6">
+                <button onclick="navigateTo('landing')" class="p-2 hover:bg-gray-100 rounded-custom transition-all text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                </button>
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900">Panel Admin RiseVisual</h2>
+                    <p class="text-sm text-gray-500">Kelola pembuatan galeri foto dan pantau progres pilihan klien Anda</p>
+                </div>
+            </div>
+
+            <!-- TAB MENU PANEL ADMIN -->
+            <div class="flex border-b border-gray-200 mb-6">
+                <button onclick="switchAdminTab('create')" id="tab-btn-create" class="py-3 px-4 text-sm font-semibold border-b-2 border-gray-900 text-gray-900 focus:outline-none transition-all">
+                    Buat Galeri Baru
+                </button>
+                <button onclick="switchAdminTab('manage')" id="tab-btn-manage" class="py-3 px-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-900 focus:outline-none transition-all">
+                    Manajemen & Pelacakan Klien
+                </button>
+            </div>
+
+            <!-- TAB 1: BUAT GALERI BARU -->
+            <div id="admin-create-container" class="space-y-6">
+                <!-- CARD INTRO: CARA EKSTRAK SEMUA FOTO SE-FOLDER SEKALIGUS -->
+                <div class="bg-gradient-to-r from-gray-900 to-gray-800 text-white rounded-custom p-6 shadow-md">
+                    <div class="flex items-start gap-4">
+                        <div class="p-2.5 bg-white bg-opacity-10 rounded-xl">
+                            <svg class="w-6 h-6 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold">Rahasia Ambil Semua Link Se-Folder Sekaligus!</h3>
+                            <p class="text-xs text-gray-300 mt-1 leading-relaxed">
+                                Kami telah merancang tombol ajaib (**Bookmarklet**) agar Anda bisa menyalin ratusan link foto dalam 1 folder Google Drive hanya dengan **sekali klik** tanpa mengetik manual.
+                            </p>
+                            
+                            <!-- Area Tombol Bookmarklet -->
+                            <div class="mt-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                                <a href="javascript:(function(){const links=Array.from(document.querySelectorAll('a[href*=\x22/file/d/\x22]')).map(a=>{const m=a.href.match(/\/file\/d\/([a-zA-Z0-9_-]{25,110})/);return m?`https://drive.google.com/file/d/\x24{m[1]}/view?usp=sharing`:null;}).filter(Boolean);const unique=[\x2522...new Set(links)];if(unique.length\x253E0){const t=unique.join('\x255Cn');navigator.clipboard.writeText(t).then(()=>{alert(`Hore! \x255Cn\x255CnBerhasil menyalin \x24{unique.length} link foto dari folder Google Drive ini ke clipboard.\x255Cn\x255CnSilakan kembali ke tab web RiseVisual lalu tempel (Paste / Ctrl+V) langsung ke dalam kotak textarea.`);}).catch(()=>{const a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();document.execCommand('copy');document.body.removeChild(a);alert(`Berhasil menyalin \x24{unique.length} link foto! Silakan tempel ke RiseVisual.`);});}else{alert('Waduh, foto tidak terdeteksi!\x255Cn\x255Cn1. Pastikan Anda sudah membuka folder Google Drive di browser.\x255Cn2. Silakan gulir (scroll) ke bawah terlebih dahulu agar seluruh gambar dimuat lengkap oleh Google Drive, lalu klik bookmark ini lagi.');}})();" 
+                                   class="inline-flex items-center gap-2 px-4 py-2.5 bg-yellow-500 hover:bg-yellow-400 text-gray-950 font-bold text-xs rounded-xl shadow-md transition-all cursor-move select-none" 
+                                   title="Seret tombol ini ke Bookmarks Bar"
+                                   onclick="event.preventDefault(); alert('Jangan diklik langsung! \n\nSilakan SERET (drag) tombol kuning ini ke bagian Bookmarks Bar browser Anda (tekan Ctrl+Shift+B jika bilah bookmark tidak terlihat). \n\nSetelah itu, buka folder Google Drive Anda dan klik bookmark tersebut!');">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1"></path>
+                                    </svg>
+                                    Tarik ke Bookmarks Bar Anda
+                                </a>
+                                <span class="text-[11px] text-gray-300 font-light">
+                                    <strong>Cara pakai:</strong> Seret tombol kuning ke Bookmarks Bar laptop Anda. Buka folder Drive, scroll ke bawah agar semua foto termuat, lalu klik bookmark tersebut. Selesai!
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white border border-gray-100 rounded-custom shadow-sm p-6 space-y-6">
+                    <!-- Form Input Data Utama -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="sm:col-span-2">
+                            <label for="admin-client-name" class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Nama Klien</label>
+                            <input type="text" id="admin-client-name" value="Sarah Graduation" placeholder="Contoh: Sarah Graduation" class="w-full px-4 py-3 border border-gray-200 rounded-custom focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-sm transition-all" />
+                        </div>
+
+                        <div>
+                            <label for="admin-max-selection" class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">Batas Maksimal Foto Dipilih</label>
+                            <input type="number" id="admin-max-selection" value="20" min="1" class="w-full px-4 py-3 border border-gray-200 rounded-custom focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-sm transition-all" />
+                        </div>
+                        <div>
+                            <label for="admin-wa-number" class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">No. WhatsApp Anda (Fotografer)</label>
+                            <input type="text" id="admin-wa-number" value="6285702125164" placeholder="Contoh: 6285702125164" class="w-full px-4 py-3 border border-gray-200 rounded-custom focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-sm transition-all" />
+                            <span class="text-[10px] text-gray-400 mt-1 block">Gunakan kode negara (awali dengan 62)</span>
+                        </div>
+                    </div>
+
+                    <!-- Bagian Penomoran File Otomatis -->
+                    <div class="border-t border-gray-100 pt-4">
+                        <h3 class="text-xs font-bold text-gray-800 uppercase tracking-wider mb-2">Penomoran Nama Berkas Otomatis</h3>
+                        <p class="text-xs text-gray-500 mb-3">Sesuaikan penomoran otomatis di bawah ini agar sesuai dengan urutan nama foto asli kamera Anda.</p>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="admin-filename-prefix" class="block text-xs font-semibold text-gray-600 mb-1">Awalan Nama File (Prefix)</label>
+                                <input type="text" id="admin-filename-prefix" value="IMG_" placeholder="Contoh: IMG_ atau DSC_" class="w-full px-4 py-2 border border-gray-200 rounded-custom focus:ring-2 focus:ring-gray-900 text-sm outline-none" />
+                            </div>
+                            <div>
+                                <label for="admin-filename-start" class="block text-xs font-semibold text-gray-600 mb-1">Dimulai dari Angka</label>
+                                <input type="number" id="admin-filename-start" value="1" min="1" class="w-full px-4 py-2 border border-gray-200 rounded-custom focus:ring-2 focus:ring-gray-900 text-sm outline-none" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Input Utama: Tempel Link Google Drive -->
+                    <div class="border-t border-gray-100 pt-6">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider">Tempel Hasil Salinan Link Foto Di Sini</label>
+                            <button onclick="loadSampleLinks()" class="text-xs font-medium text-gray-500 hover:text-gray-900 underline transition-all">Gunakan Link Contoh</button>
+                        </div>
+                        <textarea id="admin-gdrive-links" placeholder="Tempel (Paste) link-link foto hasil ekstraksi atau salinan di sini.&#10;Contoh:&#10;https://drive.google.com/file/d/1Xxxxxxx/view?usp=sharing&#10;https://drive.google.com/file/d/1Yyyyyyy/view?usp=sharing" class="w-full h-44 p-3 font-mono text-xs border border-gray-200 rounded-custom focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none bg-gray-50 no-scrollbar" style="line-height: 1.5;"></textarea>
+                        
+                        <div class="mt-2 flex justify-between items-center text-xxs text-gray-400">
+                            <span>Total tautan terdeteksi: <strong id="detected-links-count" class="text-gray-700">0</strong></span>
+                            <span>Sistem otomatis menyaring tautan duplikat secara real-time.</span>
+                        </div>
+                    </div>
+
+                    <!-- Tombol Submit -->
+                    <div class="border-t border-gray-100 pt-6 flex flex-col gap-4">
+                        <button onclick="generateShareableLink()" class="w-full flex items-center justify-center px-6 py-3 border border-transparent text-base font-semibold rounded-custom text-white bg-gray-900 hover:bg-gray-800 shadow-sm transition-all focus:outline-none">
+                            Buat Link Galeri Klien
+                        </button>
+                    </div>
+
+                    <!-- SEKSI OUTPUT LINK UNIK KLIEN -->
+                    <div id="share-link-section" class="hidden border-t-2 border-dashed border-gray-200 pt-6 space-y-3">
+                        <div class="bg-gray-50 rounded-custom p-4 border border-gray-200">
+                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">🎉 Link Galeri Siap Dibagikan!</label>
+                            <p class="text-[11px] text-gray-500 mb-3">Kirimkan link unik di bawah ini ke klien Anda. Link ini berisi data konfigurasi galeri mereka sendiri secara terenkripsi.</p>
+                            
+                            <div class="flex gap-2">
+                                <input type="text" id="share-link-output" readonly class="flex-grow px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-mono select-all outline-none" />
+                                <button onclick="copyShareableLink()" class="px-4 py-2 bg-gray-950 text-white rounded-xl text-xs font-semibold hover:bg-gray-800 transition-all">
+                                    Salin Link
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: MANAJEMEN & PELACAKAN KLIEN -->
+            <div id="admin-manage-container" class="space-y-6 hidden">
+                <!-- SUB-SEKSI A: HISTORI GALERI YANG TELAH DIBUAT -->
+                <div class="bg-white border border-gray-150 rounded-custom shadow-sm p-6">
+                    <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                        </svg>
+                        Daftar Galeri Klien Aktif
+                    </h3>
+
+                    <!-- Tabel Daftar Galeri -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="border-b border-gray-200 text-gray-500 uppercase font-semibold text-xxs tracking-wider">
+                                    <th class="py-3 px-4">Nama Klien</th>
+                                    <th class="py-3 px-4">Tanggal Dibuat</th>
+                                    <th class="py-3 px-4 text-center">Batas / Total Foto</th>
+                                    <th class="py-3 px-4 text-center">Status Pemilihan (Lokal)</th>
+                                    <th class="py-3 px-4 text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="galleries-registry-table-body" class="divide-y divide-gray-100 text-gray-700">
+                                <!-- Isi diisi dinamis oleh JS -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Placeholder jika tabel kosong -->
+                    <div id="registry-empty-state" class="text-center py-12 text-gray-400 hidden">
+                        <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                        </svg>
+                        <p class="text-xs font-medium">Belum ada histori galeri yang dibuat.</p>
+                        <p class="text-xxs text-gray-400 mt-1">Buat galeri pertama Anda di tab "Buat Galeri Baru".</p>
+                    </div>
+                </div>
+
+                <!-- SUB-SEKSI B: ALAT PEMERIKSA / IMPORTIR BERKAS SELEKSI KLIEN -->
+                <div class="bg-white border border-gray-150 rounded-custom shadow-sm p-6">
+                    <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-2 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                        </svg>
+                        Pemeriksa Hasil Seleksi Klien (Impor CSV/TXT)
+                    </h3>
+                    <p class="text-xs text-gray-500 mb-4">
+                        Jika klien Anda mengirimkan file hasil pilihan mereka (CSV atau TXT) via WhatsApp, Anda dapat mengimpor file tersebut ke sini untuk langsung memisahkan & menyalin kode nama foto untuk Lightroom.
+                    </p>
+
+                    <!-- Unggah Dropzone -->
+                    <div class="flex items-center justify-center w-full">
+                        <label class="flex flex-col items-center justify-center w-full h-24 border-2 border-gray-250 border-dashed rounded-custom cursor-pointer bg-gray-50 hover:bg-gray-100 transition-all">
+                            <div class="flex flex-col items-center justify-center text-center px-4">
+                                <svg class="w-6 h-6 text-gray-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                <p class="text-xs text-gray-600 font-medium">Unggah berkas <span class="font-bold">.csv</span> atau <span class="font-bold">.txt</span> dari WhatsApp klien</p>
+                            </div>
+                            <input type="file" id="admin-result-file-input" accept=".csv,.txt" class="hidden" onchange="handleClientResultImport(event)" />
+                        </label>
+                    </div>
+
+                    <!-- KOTAK TAMPIL HASIL DETEKSI -->
+                    <div id="inspector-result-card" class="hidden mt-6 bg-gray-50 border border-gray-200 rounded-custom p-4 space-y-4">
+                        <div class="flex justify-between items-center pb-2 border-b border-gray-200">
+                            <div>
+                                <span class="text-xxs text-gray-400 uppercase tracking-widest font-semibold block">Klien Terdeteksi</span>
+                                <span id="inspector-client-name" class="text-sm font-bold text-gray-900">-</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xxs text-gray-400 uppercase tracking-widest font-semibold block">Total Foto Dipilih</span>
+                                <span id="inspector-files-count" class="text-sm font-bold text-gray-900">-</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="text-xs font-semibold text-gray-700">Daftar File Pilihan (Siap Salin):</label>
+                                <button onclick="copyInspectorFiles()" class="text-xxs text-gray-600 hover:text-gray-900 font-semibold underline">Salin Semua Kode Berkas</button>
+                            </div>
+                            <textarea id="inspector-files-list" readonly class="w-full h-32 p-3 font-mono text-xs border border-gray-200 rounded-custom bg-white outline-none select-all no-scrollbar" style="line-height: 1.5;"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- 3. GALLERY PAGE VIEW (Halaman Pemilihan Klien) -->
+        <!-- ============================================ -->
+        <section id="view-gallery" class="page-view hidden flex flex-col flex-grow">
+            <!-- Header Galeri -->
+            <header class="py-4 border-b border-gray-100 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight text-gray-900">RiseVisual Photography</h1>
+                    <p class="text-xs text-gray-500">Galeri Pemilihan untuk: <span id="gallery-client-name" class="font-semibold text-gray-800">Nama Klien</span></p>
+                </div>
+                
+                <!-- Status Pilihan Kontra -->
+                <div class="flex items-center gap-3">
+                    <div class="text-right">
+                        <span class="text-xs font-semibold text-gray-700 block">Pilihan Foto Anda</span>
+                        <span class="text-lg font-bold text-gray-950" id="selection-counter-text">0 / 20 Terpilih</span>
+                    </div>
+                    <div class="w-24 bg-gray-150 rounded-full h-2.5 overflow-hidden">
+                        <div id="selection-progress-bar" class="bg-gray-900 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Grid Foto Utama -->
+            <div id="photo-grid-container" class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 py-6 flex-grow items-start content-start">
+                <!-- Foto diisi secara dinamis melalui JavaScript -->
+            </div>
+
+            <!-- Pesan Jika Foto Kosong -->
+            <div id="empty-photos-message" class="hidden flex flex-col items-center justify-center py-20 text-center">
+                <svg class="w-16 h-16 text-gray-355 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <h3 class="text-lg font-semibold text-gray-900">Belum Ada Foto</h3>
+                <p class="text-sm text-gray-550 max-w-sm mt-1">Gunakan link konfigurasi galeri khusus yang dikirimkan oleh fotografer Anda untuk melihat foto di sini.</p>
+                <button onclick="navigateTo('admin')" class="mt-4 px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-custom hover:bg-gray-800 transition-all">Buka Konfigurasi</button>
+            </div>
+
+            <!-- Sticky Bar Bagian Bawah untuk Konfirmasi Seleksi -->
+            <div class="sticky bottom-4 left-0 right-0 max-w-lg mx-auto z-10 px-4 mt-auto">
+                <div class="bg-gray-900 text-white p-3 rounded-2xl flex items-center justify-between shadow-xl backdrop-blur-md bg-opacity-95 border border-white border-opacity-10">
+                    <div class="pl-2">
+                        <span class="text-[10px] text-gray-400 block tracking-wider uppercase font-semibold">Foto Terpilih</span>
+                        <span id="sticky-counter-text" class="text-base font-bold text-white">0 / 20</span>
+                    </div>
+                    <button onclick="submitClientSelection()" class="px-5 py-2.5 bg-white text-gray-900 rounded-xl text-sm font-semibold hover:bg-gray-100 transition-all flex items-center gap-1.5">
+                        Selesaikan Pemilihan
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================ -->
+        <!-- 4. SUCCESS STATE VIEW (Konfirmasi Pengiriman) -->
+        <!-- ============================================ -->
+        <section id="view-success" class="page-view hidden max-w-lg mx-auto w-full py-12 text-center my-auto">
+            <div class="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <svg class="w-8 h-8 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+
+            <h2 class="text-2xl font-bold text-gray-900">Pilihan Foto Disimpan!</h2>
+            <p class="text-sm text-gray-500 mt-2">
+                Terima kasih, kurasi foto graduation Anda sudah tuntas. Silakan kirimkan hasil seleksi ini langsung ke fotografer RiseVisual.
+            </p>
+
+            <!-- Informasi Ringkasan Pilihan -->
+            <div class="my-6 bg-gray-50 border border-gray-150 rounded-custom p-4 text-left">
+                <div class="flex justify-between items-center pb-3 border-b border-gray-200">
+                    <span class="text-xs text-gray-500 font-medium">Nama Klien:</span>
+                    <span id="success-client-name" class="text-sm font-bold text-gray-900">-</span>
+                </div>
+                <div class="flex justify-between items-center pt-3">
+                    <span class="text-xs text-gray-500 font-medium">Jumlah Foto Terpilih:</span>
+                    <span id="success-selected-count" class="text-sm font-bold text-gray-900">0 Foto</span>
+                </div>
+            </div>
+
+            <!-- Tombol Pengiriman Terintegrasi -->
+            <div class="space-y-3">
+                <button onclick="handleWhatsAppShare()" class="w-full flex items-center justify-center gap-2 px-6 py-3 border border-transparent text-base font-semibold rounded-custom text-white bg-green-600 hover:bg-green-700 shadow-sm transition-all focus:outline-none">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.514 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.457L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.414 9.863-9.83 0-2.623-1.02-5.092-2.871-6.944-1.85-1.851-4.312-2.871-6.932-2.872-5.438 0-9.863 4.414-9.866 9.831-.001 1.768.461 3.497 1.339 5.025l-.991 3.62 3.733-.979zm11.168-7.55c-.3-.15-1.771-.875-2.046-.975-.276-.1-.477-.15-.677.15-.199.3-.778.975-.953 1.175-.177.2-.353.225-.653.075-.3-.15-1.267-.467-2.414-1.492-.893-.797-1.496-1.782-1.672-2.082-.176-.3-.019-.462.13-.611.135-.134.3-.349.45-.524.149-.175.199-.3.299-.5.1-.2.05-.375-.025-.525-.075-.15-.677-1.632-.927-2.233-.243-.585-.49-.505-.677-.515-.175-.008-.375-.01-.576-.01-.2 0-.526.075-.802.375-.276.3-1.053 1.03-1.053 2.512 0 1.482 1.079 2.912 1.23 3.111.15.2 2.122 3.241 5.14 4.545.718.311 1.278.497 1.715.637.722.23 1.378.197 1.898.12.58-.087 1.771-.725 2.022-1.424.25-.7.25-1.3 .175-1.424-.075-.125-.275-.2-.575-.35z"/>
+                    </svg>
+                    Kirim Konfirmasi via WhatsApp
+                </button>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="handleCSVDownload()" class="flex items-center justify-center gap-1 px-4 py-2.5 border border-gray-200 text-xs font-semibold rounded-custom text-gray-750 bg-white hover:bg-gray-50 shadow-xs transition-all">
+                        Unduh File CSV
+                    </button>
+                    <button onclick="handleTXTDownload()" class="flex items-center justify-center gap-1 px-4 py-2.5 border border-gray-200 text-xs font-semibold rounded-custom text-gray-750 bg-white hover:bg-gray-50 shadow-xs transition-all">
+                        Unduh File TXT
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-[10px] text-gray-400 border-t border-gray-100">
+        &copy; 2026 RiseVisual. Dikembangkan khusus untuk fotografer graduation cerdas.
+    </footer>
+
+    <!-- ============================================ -->
+    <!-- 5. LIGHTBOX MODAL (Pratinjau Foto Zoom) -->
+    <!-- ============================================ -->
+    <div id="lightbox-modal" class="fixed inset-0 bg-black bg-opacity-95 z-50 flex flex-col items-center justify-center p-4 hidden">
+        <!-- Tombol Tutup -->
+        <button onclick="closeLightbox()" class="absolute top-4 right-4 p-2 bg-white bg-opacity-10 hover:bg-opacity-20 text-white rounded-full transition-all">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+
+        <!-- Wadah Gambar Lightbox -->
+        <div class="relative max-w-4xl w-full flex-grow flex items-center justify-center">
+            <img id="lightbox-image" src="" alt="Pratinjau Foto" class="max-w-full max-h-[75vh] object-contain rounded-lg shadow-2xl transition-all" />
+            
+            <!-- Indikator Aktif Seleksi dalam Lightbox -->
+            <div id="lightbox-selection-status" class="absolute bottom-4 left-1/2 -translate-x-1/2 bg-gray-900 bg-opacity-80 text-white px-4 py-2 rounded-full text-xs font-semibold backdrop-blur-sm border border-white border-opacity-10">
+                Foto belum terpilih
+            </div>
+        </div>
+
+        <!-- Panel Kontrol Navigasi Lightbox -->
+        <div class="w-full max-w-md flex items-center justify-between pb-6 mt-4">
+            <div class="flex gap-4">
+                <button onclick="navigateLightbox(-1)" class="px-4 py-2.5 bg-white bg-opacity-10 text-white rounded-xl hover:bg-opacity-20 text-xs font-semibold transition-all">
+                    Sebelumnya
+                </button>
+                <button onclick="navigateLightbox(1)" class="px-4 py-2.5 bg-white bg-opacity-10 text-white rounded-xl hover:bg-opacity-20 text-xs font-semibold transition-all">
+                    Selanjutnya
+                </button>
+            </div>
+
+            <!-- Tombol Pilih di Lightbox -->
+            <button id="lightbox-toggle-btn" onclick="toggleLightboxSelection()" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 bg-white text-gray-900">
+                Pilih Foto Ini
+            </button>
+        </div>
+    </div>
+
+    <!-- Alert Box Notifikasi Pengganti Alert Browser -->
+    <div id="custom-alert" class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 bg-gray-900 text-white px-5 py-3 rounded-xl shadow-2xl border border-white border-opacity-10 flex items-center gap-2 text-xs transition-all duration-300 opacity-0 pointer-events-none">
+        <svg class="w-4 h-4 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+        </svg>
+        <span id="custom-alert-message">Notifikasi</span>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- LOGIKA JAVASCRIPT UTAMA -->
+    <!-- ============================================ -->
+    <script>
+        // --- 1. STATE MANAGEMENT ---
+        const STATE = {
+            clientName: "nama client",
+            maxSelection: 20,
+            photoList: [],         // Berisi: { filename, url, driveUrl }
+            selectedPhotos: [],    // Array nama file yang dipilih klien
+            photographerWa: "6285702125164",
+            filenamePrefix: "IMG_",
+            filenameStart: 1,
+            currentLightboxIdx: -1,
+            galleriesRegistry: []  // Daftar semua histori galeri unik yang berhasil di-generate
+        };
+
+        // --- 2. SAMPLE DATA ---
+        const SAMPLE_RAW_LINKS = `https://drive.google.com/file/d/1XgT6fB-8tIbyOaR9_X-MvE4-VpY_mS_d/view?usp=sharing
+https://drive.google.com/file/d/1YhU7gC-9uJczPaS_Y-NwF5-WqZ_n_T_e/view?usp=sharing
+https://drive.google.com/file/d/1ZiV8hD-AvKdaQbT_Z-OxG6-XrA_o_U_f/view?usp=sharing
+https://drive.google.com/file/d/1WjW9iE-BwLebRcU_A-PyH7-YsB_p_V_g/view?usp=sharing
+https://drive.google.com/file/d/1VkX0jF-CxMfcSdV_B-QzI8-ZtC_q_W_h/view?usp=sharing
+https://drive.google.com/file/d/1UkY1kG-DxNgdTeW_C-R0J9-auD_r_X_i/view?usp=sharing`;
+
+        // --- 3. NAVIGASI SPA ---
+        function navigateTo(viewName) {
+            document.querySelectorAll('.page-view').forEach(view => {
+                view.classList.add('hidden');
+                view.style.opacity = '0';
+                view.style.transform = 'translateY(8px)';
+            });
+
+            const activeView = document.getElementById(`view-${viewName}`);
+            if (activeView) {
+                activeView.classList.remove('hidden');
+                setTimeout(() => {
+                    activeView.style.opacity = '1';
+                    activeView.style.transform = 'translateY(0)';
+                }, 50);
+            }
+
+            if (viewName === 'gallery') {
+                renderGallery();
+                updateSelectionUI();
+            } else if (viewName === 'success') {
+                document.getElementById('success-client-name').textContent = STATE.clientName;
+                document.getElementById('success-selected-count').textContent = `${STATE.selectedPhotos.length} Foto`;
+            } else if (viewName === 'admin') {
+                renderGalleriesRegistry();
+            }
+            
+            checkActiveGalleryButton();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // --- 4. DATA MANAGEMENT (LOCALSTORAGE) ---
+        // Simpan seleksi foto unik per klien
+        function saveToLocalStorage() {
+            const key = `risevisual_selected_${STATE.clientName.replace(/\s+/g, '_')}`;
+            localStorage.setItem(key, JSON.stringify(STATE.selectedPhotos));
+        }
+
+        // Muat seleksi foto unik per klien
+        function loadFromLocalStorage() {
+            const key = `risevisual_selected_${STATE.clientName.replace(/\s+/g, '_')}`;
+            const savedSelectedPhotos = localStorage.getItem(key);
+            if (savedSelectedPhotos) {
+                STATE.selectedPhotos = JSON.parse(savedSelectedPhotos);
+            } else {
+                STATE.selectedPhotos = [];
+            }
+        }
+
+        // Simpan database registry daftar galeri
+        function saveRegistryToLocalStorage() {
+            localStorage.setItem('risevisual_galleries_registry', JSON.stringify(STATE.galleriesRegistry));
+        }
+
+        // Memuat semua registry galeri yang disimpan
+        function loadRegistryFromLocalStorage() {
+            const registry = localStorage.getItem('risevisual_galleries_registry');
+            if (registry) {
+                STATE.galleriesRegistry = JSON.parse(registry);
+            } else {
+                STATE.galleriesRegistry = [];
+            }
+        }
+
+        function checkActiveGalleryButton() {
+            const btn = document.getElementById('btn-open-active-gallery');
+            if (STATE.photoList && STATE.photoList.length > 0) {
+                btn.classList.remove('hidden');
+            } else {
+                btn.classList.add('hidden');
+            }
+        }
+
+        function updateDetectedLinksCount(count) {
+            document.getElementById('detected-links-count').textContent = count;
+        }
+
+        // --- 5. LOGIKA PARSING DRIVE & ENCODING PAYLOAD ---
+        function loadSampleLinks() {
+            document.getElementById('admin-gdrive-links').value = SAMPLE_RAW_LINKS;
+            updateDetectedLinksCount(6);
+            showNotification("Link sampel Google Drive berhasil ditambahkan.");
+        }
+
+        function parseGDriveLinksToState(rawText) {
+            const regex = /(?:https?:\/\/)?(?:drive\.google\.com\/(?:file\/d\/|open\?id=)|docs\.google\.com\/uc\?id=)([a-zA-Z0-9_-]{25,110})/gi;
+            const matches = [...rawText.matchAll(regex)];
+            const parsedPhotos = [];
+            let currentNum = STATE.filenameStart;
+            const seenIds = new Set();
+
+            matches.forEach(match => {
+                const fileId = match[1];
+                if (seenIds.has(fileId)) return;
+                seenIds.add(fileId);
+
+                const numString = String(currentNum).padStart(4, '0');
+                const generatedFilename = `${STATE.filenamePrefix}${numString}.jpg`;
+                const fullDriveUrl = `https://drive.google.com/file/d/${fileId}/view?usp=sharing`;
+                
+                parsedPhotos.push({
+                    id: fileId,
+                    filename: generatedFilename,
+                    url: `https://lh3.googleusercontent.com/d/${fileId}`,
+                    driveUrl: fullDriveUrl
+                });
+                currentNum++;
+            });
+
+            return parsedPhotos;
+        }
+
+        function encodePayload(obj) {
+            const json = JSON.stringify(obj);
+            return btoa(encodeURIComponent(json).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+                return String.fromCharCode('0x' + p1);
+            }));
+        }
+
+        function decodePayload(str) {
+            try {
+                const json = decodeURIComponent(atob(str).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(json);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function generateShareableLink() {
+            const client = document.getElementById('admin-client-name').value.trim();
+            const max = parseInt(document.getElementById('admin-max-selection').value, 10);
+            const wa = document.getElementById('admin-wa-number').value.trim();
+            const prefix = document.getElementById('admin-filename-prefix').value.trim();
+            const startNum = parseInt(document.getElementById('admin-filename-start').value, 10);
+            const rawLinks = document.getElementById('admin-gdrive-links').value.trim();
+
+            if (!client) {
+                showNotification("Masukkan nama klien.");
+                return;
+            }
+            if (isNaN(max) || max <= 0) {
+                showNotification("Tentukan batas maksimal foto yang valid.");
+                return;
+            }
+            if (!wa) {
+                showNotification("Masukkan nomor WhatsApp Anda.");
+                return;
+            }
+            if (!rawLinks) {
+                showNotification("Harap tempel tautan foto Google Drive terlebih dahulu.");
+                return;
+            }
+
+            const photos = parseGDriveLinksToState(rawLinks);
+            if (photos.length === 0) {
+                showNotification("Gagal membaca link Google Drive. Periksa kembali tautan Anda.");
+                return;
+            }
+
+            const payload = {
+                n: client,
+                m: max,
+                wa: wa,
+                px: prefix,
+                st: isNaN(startNum) ? 1 : startNum,
+                ids: photos.map(p => p.id)
+            };
+
+            const hashString = encodePayload(payload);
+            const cleanOrigin = window.location.href.split('#')[0];
+            const shareableUrl = `${cleanOrigin}#gallery=${hashString}`;
+
+            // Tampilkan panel link yang dihasilkan
+            document.getElementById('share-link-output').value = shareableUrl;
+            document.getElementById('share-link-section').classList.remove('hidden');
+            
+            // Simpan konfigurasi ini sebagai galeri aktif pada device fotografer sendiri
+            STATE.clientName = client;
+            STATE.maxSelection = max;
+            STATE.photographerWa = wa;
+            STATE.filenamePrefix = prefix;
+            STATE.filenameStart = payload.st;
+            STATE.photoList = photos;
+            
+            loadFromLocalStorage(); 
+            saveToLocalStorage();
+
+            // TAMBAHKAN ATAU PERBARUI KE DALAM REGISTRY GALERI DI PANEL ADMIN
+            const indexRegistry = STATE.galleriesRegistry.findIndex(item => item.clientName === client);
+            const newRegistryItem = {
+                clientName: client,
+                maxSelection: max,
+                photoCount: photos.length,
+                dateCreated: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
+                url: shareableUrl
+            };
+
+            if (indexRegistry > -1) {
+                STATE.galleriesRegistry[indexRegistry] = newRegistryItem;
+            } else {
+                STATE.galleriesRegistry.push(newRegistryItem);
+            }
+
+            saveRegistryToLocalStorage();
+            renderGalleriesRegistry();
+
+            showNotification("Berhasil membuat link galeri unik untuk klien!");
+            document.getElementById('share-link-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function copyShareableLink() {
+            const linkInput = document.getElementById('share-link-output');
+            linkInput.select();
+            linkInput.setSelectionRange(0, 99999);
+
+            try {
+                document.execCommand('copy');
+                showNotification("Link galeri berhasil disalin ke Clipboard!");
+            } catch (err) {
+                showNotification("Gagal menyalin. Silakan salin link secara manual.");
+            }
+        }
+
+        // --- 5B. TABS PANEL ADMIN & MANAJEMEN KLIEN ---
+        function switchAdminTab(tabName) {
+            const btnCreate = document.getElementById('tab-btn-create');
+            const btnManage = document.getElementById('tab-btn-manage');
+            const containerCreate = document.getElementById('admin-create-container');
+            const containerManage = document.getElementById('admin-manage-container');
+
+            if (tabName === 'create') {
+                btnCreate.className = "py-3 px-4 text-sm font-semibold border-b-2 border-gray-900 text-gray-900 focus:outline-none transition-all";
+                btnManage.className = "py-3 px-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-900 focus:outline-none transition-all";
+                containerCreate.classList.remove('hidden');
+                containerManage.classList.add('hidden');
+            } else {
+                btnCreate.className = "py-3 px-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-900 focus:outline-none transition-all";
+                btnManage.className = "py-3 px-4 text-sm font-semibold border-b-2 border-gray-900 text-gray-900 focus:outline-none transition-all";
+                containerCreate.classList.add('hidden');
+                containerManage.classList.remove('hidden');
+                renderGalleriesRegistry();
+            }
+        }
+
+        function renderGalleriesRegistry() {
+            const tbody = document.getElementById('galleries-registry-table-body');
+            const emptyState = document.getElementById('registry-empty-state');
+            
+            tbody.innerHTML = "";
+
+            if (STATE.galleriesRegistry.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+
+            STATE.galleriesRegistry.forEach((item, index) => {
+                // Periksa apakah ada progres lokal untuk klien ini di browser saat ini
+                const key = `risevisual_selected_${item.clientName.replace(/\s+/g, '_')}`;
+                const savedLocalProgress = localStorage.getItem(key);
+                let progressText = "Belum mulai memilih";
+                let badgeClass = "bg-gray-100 text-gray-700";
+
+                if (savedLocalProgress) {
+                    const parsed = JSON.parse(savedLocalProgress);
+                    if (parsed.length > 0) {
+                        progressText = `${parsed.length} dari ${item.maxSelection} foto`;
+                        badgeClass = parsed.length >= item.maxSelection ? "bg-green-100 text-green-850 font-bold" : "bg-yellow-100 text-yellow-850 font-medium";
+                    }
+                }
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="py-4 px-4 font-semibold text-gray-900">${item.clientName}</td>
+                    <td class="py-4 px-4 text-gray-500">${item.dateCreated}</td>
+                    <td class="py-4 px-4 text-center font-medium text-gray-700">${item.maxSelection} / ${item.photoCount}</td>
+                    <td class="py-4 px-4 text-center">
+                        <span class="inline-flex items-center px-2.5 py-1.5 rounded-full text-xxs font-medium ${badgeClass}">
+                            ${progressText}
+                        </span>
+                    </td>
+                    <td class="py-4 px-4 text-right flex items-center justify-end gap-2.5">
+                        <button onclick="copySpecificShareLink('${item.url}')" class="text-xs font-semibold text-gray-800 hover:text-black hover:underline">
+                            Salin Link
+                        </button>
+                        <span class="text-gray-300">|</span>
+                        <a href="${item.url}" class="text-xs font-semibold text-blue-600 hover:text-blue-800 hover:underline">
+                            Uji Galeri
+                        </a>
+                        <span class="text-gray-300">|</span>
+                        <button onclick="deleteGalleryFromRegistry(${index})" class="text-xs font-medium text-red-500 hover:text-red-700 hover:underline">
+                            Hapus
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function copySpecificShareLink(url) {
+            const dummy = document.createElement('input');
+            document.body.appendChild(dummy);
+            dummy.value = url;
+            dummy.select();
+            document.execCommand('copy');
+            document.body.removeChild(dummy);
+            showNotification("Tautan klien berhasil disalin ke Clipboard!");
+        }
+
+        function deleteGalleryFromRegistry(index) {
+            const confirmDelete = confirm(`Apakah Anda yakin ingin menghapus galeri "${STATE.galleriesRegistry[index].clientName}" dari daftar ini?`);
+            if (confirmDelete) {
+                STATE.galleriesRegistry.splice(index, 1);
+                saveRegistryToLocalStorage();
+                renderGalleriesRegistry();
+                showNotification("Galeri klien berhasil dihapus.");
+            }
+        }
+
+        // --- 5C. ALAT INSPEKTOR HASIL EKSPOR KLIEN (IMPORTIR TXT / CSV) ---
+        function handleClientResultImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                let clientName = "Klien Tidak Diketahui";
+                let selectedCount = 0;
+                let filesList = [];
+
+                if (file.name.endsWith('.csv')) {
+                    // PARSE FORMAT CSV
+                    const lines = text.split(/\r?\n/);
+                    // Ambil baris pertama sebagai Header jika ada, lewati header
+                    const startIdx = (lines[0].trim().toLowerCase() === "filename") ? 1 : 0;
+                    for (let i = startIdx; i < lines.length; i++) {
+                        const line = lines[i].trim();
+                        if (line) {
+                            filesList.push(line);
+                        }
+                    }
+                    selectedCount = filesList.length;
+                    
+                    // Coba deteksi nama klien dari penamaan berkas unduhan
+                    const nameMatch = file.name.match(/risevisual_(.*)_pilihan\.csv/);
+                    if (nameMatch && nameMatch[1]) {
+                        clientName = nameMatch[1].replace(/_/g, ' ').toUpperCase();
+                    }
+                } else {
+                    // PARSE FORMAT TXT
+                    const lines = text.split(/\r?\n/);
+                    let isCapturingPhotos = false;
+                    
+                    lines.forEach(line => {
+                        const trimmed = line.trim();
+                        if (trimmed.startsWith("Nama Klien") || trimmed.startsWith("Client")) {
+                            const parts = trimmed.split(':');
+                            if (parts[1]) clientName = parts[1].trim();
+                        }
+                        
+                        // Menemukan baris pembuka daftar foto terpilih
+                        if (trimmed.startsWith("Daftar Berkas Pilihan:") || trimmed.startsWith("Daftar file foto pilihan:")) {
+                            isCapturingPhotos = true;
+                            return; // Lanjut ke baris berikutnya
+                        }
+                        
+                        if (isCapturingPhotos && trimmed) {
+                            // Bersihkan penomoran otomatis seperti "1. IMG_001.jpg" atau "- IMG_001"
+                            const cleanedLine = trimmed.replace(/^\d+[\.\)\-]\s+/, '').replace(/^[\-\*]\s+/, '');
+                            filesList.push(cleanedLine);
+                        }
+                    });
+                    selectedCount = filesList.length;
+                }
+
+                // Perbarui tampilan UI Inspecting Hasil
+                const inspectorCard = document.getElementById('inspector-result-card');
+                const inspectorName = document.getElementById('inspector-client-name');
+                const inspectorCount = document.getElementById('inspector-files-count');
+                const inspectorTextarea = document.getElementById('inspector-files-list');
+
+                inspectorName.textContent = clientName;
+                inspectorCount.textContent = `${selectedCount} Foto terpilih`;
+                
+                // Gabungkan nama file dengan pemisah baris baru
+                inspectorTextarea.value = filesList.join('\n');
+
+                inspectorCard.classList.remove('hidden');
+                showNotification("Hasil pilihan klien berhasil dipindai!");
+                
+                // Beri efek scroll lancar
+                inspectorCard.scrollIntoView({ behavior: 'smooth' });
+            };
+            
+            reader.readAsText(file);
+        }
+
+        function copyInspectorFiles() {
+            const area = document.getElementById('inspector-files-list');
+            area.select();
+            area.setSelectionRange(0, 99999);
+            try {
+                document.execCommand('copy');
+                showNotification("Seluruh kode foto berhasil disalin untuk Lightroom!");
+            } catch (err) {
+                showNotification("Gagal menyalin otomatis.");
+            }
+        }
+
+        // --- 6. RENDERING & SELEKSI GALERI ---
+        function renderGallery() {
+            const container = document.getElementById('photo-grid-container');
+            const emptyMessage = document.getElementById('empty-photos-message');
+            
+            document.getElementById('gallery-client-name').textContent = STATE.clientName;
+            container.innerHTML = "";
+
+            if (!STATE.photoList || STATE.photoList.length === 0) {
+                container.classList.add('hidden');
+                emptyMessage.classList.remove('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            emptyMessage.classList.add('hidden');
+
+            STATE.photoList.forEach((photo, index) => {
+                const isSelected = STATE.selectedPhotos.includes(photo.filename);
+                const card = document.createElement('div');
+                card.className = `photo-card relative bg-gray-50 border-2 ${isSelected ? 'border-gray-900 ring-2 ring-gray-900 ring-opacity-10' : 'border-gray-200'} rounded-custom overflow-hidden aspect-[4/5] cursor-pointer group shadow-xs`;
+                card.id = `card-photo-${index}`;
+                
+                card.innerHTML = `
+                    <div class="w-full h-full relative" onclick="toggleSelection('${photo.filename}', ${index})">
+                        <img 
+                            src="${photo.url}" 
+                            alt="${photo.filename}" 
+                            loading="lazy" 
+                            class="w-full h-full object-cover select-none transition-transform duration-500 group-hover:scale-105"
+                            onerror="this.onerror=null; this.parentNode.innerHTML=getFallbackImageSvg('${photo.filename}')"
+                        />
+                        
+                        <!-- Overlay Transparan -->
+                        <div class="absolute inset-0 bg-black ${isSelected ? 'bg-opacity-20' : 'bg-opacity-0 hover:bg-opacity-5'} transition-all flex flex-col justify-between p-3">
+                            <!-- Tombol Centang Indikator -->
+                            <div class="self-end flex items-center justify-center w-6 h-6 rounded-full border border-white ${isSelected ? 'bg-gray-900 text-white border-transparent' : 'bg-black bg-opacity-30 text-transparent'} transition-all">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Nama Berkas & Tombol Lightbox Zoom -->
+                    <div class="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/80 to-transparent flex items-center justify-between text-white">
+                        <span class="text-[10px] font-mono truncate max-w-[70%] select-none">${photo.filename}</span>
+                        <button onclick="openLightbox(${index})" class="p-1 hover:bg-white hover:bg-opacity-20 rounded-md transition-all">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function getFallbackImageSvg(filename) {
+            return `
+                <div class="w-full h-full flex flex-col items-center justify-center bg-gray-100 text-gray-400 p-4 text-center select-none">
+                    <svg class="w-6 h-6 mb-1 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <span class="text-[9px] font-mono truncate w-full block">${filename}</span>
+                </div>
+            `;
+        }
+
+        function toggleSelection(filename, idx) {
+            const isSelected = STATE.selectedPhotos.includes(filename);
+
+            if (isSelected) {
+                STATE.selectedPhotos = STATE.selectedPhotos.filter(item => item !== filename);
+            } else {
+                if (STATE.selectedPhotos.length >= STATE.maxSelection) {
+                    showNotification(`Maksimal memilih ${STATE.maxSelection} foto.`);
+                    return;
+                }
+                STATE.selectedPhotos.push(filename);
+            }
+
+            saveToLocalStorage();
+            updateSelectionUI();
+
+            // Ubah gaya visual card di galeri seketika
+            const card = document.getElementById(`card-photo-${idx}`);
+            if (card) {
+                const checked = STATE.selectedPhotos.includes(filename);
+                if (checked) {
+                    card.classList.remove('border-gray-200');
+                    card.classList.add('border-gray-900', 'ring-2', 'ring-gray-900', 'ring-opacity-10');
+                } else {
+                    card.classList.remove('border-gray-900', 'ring-2', 'ring-gray-900', 'ring-opacity-10');
+                    card.classList.add('border-gray-200');
+                }
+
+                const checkIndicator = card.querySelector('.self-end');
+                if (checkIndicator) {
+                    if (checked) {
+                        checkIndicator.className = "self-end flex items-center justify-center w-6 h-6 rounded-full border border-white bg-gray-900 text-white border-transparent transition-all";
+                    } else {
+                        checkIndicator.className = "self-end flex items-center justify-center w-6 h-6 rounded-full border border-white bg-black bg-opacity-40 text-transparent transition-all";
+                    }
+                }
+            }
+        }
+
+        function updateSelectionUI() {
+            const count = STATE.selectedPhotos.length;
+            const max = STATE.maxSelection;
+            const percent = Math.min((count / max) * 100, 100);
+
+            document.getElementById('selection-counter-text').textContent = `${count} / ${max} Terpilih`;
+            document.getElementById('sticky-counter-text').textContent = `${count} / ${max}`;
+            document.getElementById('selection-progress-bar').style.width = `${percent}%`;
+        }
+
+        // Menambahkan listener otomatis untuk menghitung jumlah link saat user menempel teks di textarea
+        document.getElementById('admin-gdrive-links').addEventListener('input', function(e) {
+            const photos = parseGDriveLinksToState(e.target.value);
+            updateDetectedLinksCount(photos.length);
+        });
+
+        function submitClientSelection() {
+            if (STATE.selectedPhotos.length === 0) {
+                showNotification("Pilih minimal 1 foto terbaik Anda sebelum melakukan konfirmasi.");
+                return;
+            }
+            navigateTo('success');
+        }
+
+        // --- 7. EXPORT LOGIC & WHATSAPP ---
+        function generateCSVData() {
+            let csvContent = "FileName\r\n";
+            STATE.selectedPhotos.forEach(filename => {
+                csvContent += `${filename}\r\n`;
+            });
+            return csvContent;
+        }
+
+        function generateTXTData() {
+            let txtContent = "RiseVisual Photo Selector - Hasil Seleksi\r\n";
+            txtContent += "===================================\r\n";
+            txtContent += `Nama Klien      : ${STATE.clientName}\r\n`;
+            txtContent += `Tanggal Pilih   : ${formatDate(new Date())}\r\n`;
+            txtContent += `Jumlah Dipilih  : ${STATE.selectedPhotos.length} / ${STATE.maxSelection}\r\n`;
+            txtContent += "===================================\r\n\r\n";
+            txtContent += "Daftar Berkas Pilihan:\r\n";
+            STATE.selectedPhotos.forEach((filename, idx) => {
+                txtContent += `${idx + 1}. ${filename}\r\n`;
+            });
+            return txtContent;
+        }
+
+        function handleCSVDownload() {
+            const csv = generateCSVData();
+            const cleanName = STATE.clientName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            triggerFileDownload(csv, `risevisual_${cleanName}_pilihan.csv`, 'text/csv;charset=utf-8;');
+            showNotification("File CSV berhasil disimpan.");
+        }
+
+        function handleTXTDownload() {
+            const txt = generateTXTData();
+            const cleanName = STATE.clientName.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+            triggerFileDownload(txt, `risevisual_${cleanName}_pilihan.txt`, 'text/plain;charset=utf-8;');
+            showNotification("File TXT berhasil disimpan.");
+        }
+
+        function handleWhatsAppShare() {
+            let msg = `Halo RiseVisual.\n`;
+            msg += `Saya sudah selesai memilih foto graduation.\n\n`;
+            msg += `*Klien:* ${STATE.clientName}\n`;
+            msg += `*Jumlah Terpilih:* ${STATE.selectedPhotos.length} / ${STATE.maxSelection} foto\n\n`;
+            msg += `*Daftar Berkas Pilihan:*\n`;
+            
+            STATE.selectedPhotos.forEach((filename) => {
+                msg += `- ${filename}\n`;
+            });
+            
+            msg += `\nTerima kasih!`;
+
+            const waUrl = `https://wa.me/${STATE.photographerWa}?text=${encodeURIComponent(msg)}`;
+            window.open(waUrl, '_blank');
+            showNotification("Membuka aplikasi WhatsApp...");
+        }
+
+        function triggerFileDownload(content, filename, contentType) {
+            const blob = new Blob([content], { type: contentType });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // --- 8. PRATINJAU LIGHTBOX DIALOG ---
+        function openLightbox(index) {
+            STATE.currentLightboxIdx = index;
+            const photo = STATE.photoList[index];
+            const isSelected = STATE.selectedPhotos.includes(photo.filename);
+
+            const modal = document.getElementById('lightbox-modal');
+            const img = document.getElementById('lightbox-image');
+            
+            img.src = photo.url;
+            img.onerror = function() {
+                this.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='800' height='600' viewBox='0 0 800 600'><rect width='100%' height='100%' fill='%231f2937'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='24' fill='%239ca3af'>Gagal Memuat Gambar</text></svg>";
+            };
+
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; 
+
+            updateLightboxControlUI(photo.filename, isSelected);
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox-modal').classList.add('hidden');
+            document.body.style.overflow = '';
+        }
+
+        function navigateLightbox(direction) {
+            let nextIdx = STATE.currentLightboxIdx + direction;
+            
+            if (nextIdx >= STATE.photoList.length) nextIdx = 0;
+            if (nextIdx < 0) nextIdx = STATE.photoList.length - 1;
+
+            STATE.currentLightboxIdx = nextIdx;
+            const photo = STATE.photoList[nextIdx];
+            const isSelected = STATE.selectedPhotos.includes(photo.filename);
+
+            document.getElementById('lightbox-image').src = photo.url;
+            updateLightboxControlUI(photo.filename, isSelected);
+        }
+
+        function updateLightboxControlUI(filename, isSelected) {
+            const statusLabel = document.getElementById('lightbox-selection-status');
+            const actionBtn = document.getElementById('lightbox-toggle-btn');
+
+            statusLabel.textContent = isSelected ? `✓ ${filename} (Terpilih)` : `${filename} (Belum Terpilih)`;
+            
+            if (isSelected) {
+                statusLabel.classList.remove('bg-gray-900');
+                statusLabel.classList.add('bg-green-700');
+                actionBtn.textContent = "Batalkan Pilihan";
+                actionBtn.className = "px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-red-650 hover:bg-red-700 text-white bg-red-600";
+            } else {
+                statusLabel.classList.add('bg-gray-900');
+                statusLabel.classList.remove('bg-green-700');
+                actionBtn.textContent = "Pilih Foto Ini";
+                actionBtn.className = "px-5 py-2.5 rounded-xl text-xs font-bold transition-all bg-white text-gray-900 hover:bg-gray-100";
+            }
+        }
+
+        function toggleLightboxSelection() {
+            const idx = STATE.currentLightboxIdx;
+            const photo = STATE.photoList[idx];
+            
+            toggleSelection(photo.filename, idx);
+
+            const isSelectedNow = STATE.selectedPhotos.includes(photo.filename);
+            updateLightboxControlUI(photo.filename, isSelectedNow);
+        }
+
+        // --- 9. UTILITIES & DETEKSI PARAMETER URL ---
+        function formatDate(date) {
+            const opt = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            return date.toLocaleDateString('id-ID', opt);
+        }
+
+        function showNotification(message) {
+            const alertBox = document.getElementById('custom-alert');
+            const alertMsg = document.getElementById('custom-alert-message');
+            
+            alertMsg.textContent = message;
+            alertBox.classList.remove('opacity-0', 'pointer-events-none');
+            
+            setTimeout(() => {
+                alertBox.classList.add('opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
+        function resetAppAndStartOver() {
+            STATE.selectedPhotos = [];
+            const cleanOrigin = window.location.href.split('#')[0];
+            window.location.href = cleanOrigin; 
+        }
+
+        function checkUrlHashAndRouting() {
+            const hash = window.location.hash;
+            if (hash && hash.startsWith('#gallery=')) {
+                const b64Data = hash.replace('#gallery=', '');
+                const config = decodePayload(b64Data);
+
+                if (config) {
+                    STATE.clientName = config.n;
+                    STATE.maxSelection = config.m;
+                    STATE.photographerWa = config.wa;
+                    STATE.filenamePrefix = config.px;
+                    STATE.filenameStart = config.st;
+
+                    let currentNum = config.st;
+                    STATE.photoList = config.ids.map(id => {
+                        const numString = String(currentNum).padStart(4, '0');
+                        const generatedFilename = `${STATE.filenamePrefix}${numString}.jpg`;
+                        currentNum++;
+                        return {
+                            id: id,
+                            filename: generatedFilename,
+                            url: `https://lh3.googleusercontent.com/d/${id}`,
+                            driveUrl: `https://drive.google.com/file/d/${id}/view?usp=sharing`
+                        };
+                    });
+
+                    loadFromLocalStorage();
+
+                    navigateTo('gallery');
+                    showNotification(`Selamat datang, ${STATE.clientName}! Silakan pilih foto terbaik Anda.`);
+                    return true;
+                } else {
+                    showNotification("Link galeri rusak atau tidak valid.");
+                }
+            }
+            return false;
+        }
+
+        // --- 10. METODE INISIALISASI ---
+        window.onload = function() {
+            // Memuat database registri histori secara lokal
+            loadRegistryFromLocalStorage();
+
+            const isLoadedFromLink = checkUrlHashAndRouting();
+            
+            if (!isLoadedFromLink) {
+                const savedClientName = localStorage.getItem('risevisual_clientName');
+                const savedMaxSelection = localStorage.getItem('risevisual_maxSelection');
+                const savedPhotographerWa = localStorage.getItem('risevisual_photographerWa');
+                const savedFilenamePrefix = localStorage.getItem('risevisual_filenamePrefix');
+                const savedFilenameStart = localStorage.getItem('risevisual_filenameStart');
+                const savedPhotoList = localStorage.getItem('risevisual_photoList');
+
+                if (savedClientName) STATE.clientName = savedClientName;
+                if (savedMaxSelection) STATE.maxSelection = parseInt(savedMaxSelection, 10);
+                if (savedPhotographerWa) STATE.photographerWa = savedPhotographerWa;
+                if (savedFilenamePrefix) STATE.filenamePrefix = savedFilenamePrefix;
+                if (savedFilenameStart) STATE.filenameStart = parseInt(savedFilenameStart, 10);
+                if (savedPhotoList) STATE.photoList = JSON.parse(savedPhotoList);
+
+                // Setel ulang UI Panel Admin
+                document.getElementById('admin-client-name').value = STATE.clientName;
+                document.getElementById('admin-max-selection').value = STATE.maxSelection;
+                document.getElementById('admin-wa-number').value = STATE.photographerWa;
+                document.getElementById('admin-filename-prefix').value = STATE.filenamePrefix;
+                document.getElementById('admin-filename-start').value = STATE.filenameStart;
+
+                if (STATE.photoList && STATE.photoList.length > 0) {
+                    const linkArray = STATE.photoList.map(item => item.driveUrl || `https://drive.google.com/file/d/${item.id}/view`);
+                    document.getElementById('admin-gdrive-links').value = linkArray.join('\n');
+                    updateDetectedLinksCount(linkArray.length);
+                }
+
+                navigateTo('landing');
+            }
+
+            document.addEventListener('keydown', function(e) {
+                const lightboxHidden = document.getElementById('lightbox-modal').classList.contains('hidden');
+                if (!lightboxHidden) {
+                    if (e.key === "Escape") closeLightbox();
+                    if (e.key === "ArrowLeft") navigateLightbox(-1);
+                    if (e.key === "ArrowRight") navigateLightbox(1);
+                }
+            });
+
+            window.addEventListener('hashchange', checkUrlHashAndRouting);
+        };
+    </script>
+</body>
+</html>
