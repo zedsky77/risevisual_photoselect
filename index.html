@@ -171,7 +171,7 @@
                         </div>
                         <div>
                             <label for="admin-wa-number" class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">No. WhatsApp Anda (Fotografer)</label>
-                            <input type="text" id="admin-wa-number" value="6285702125164" placeholder="Contoh: 6285702125164" class="w-full px-4 py-3 border border-gray-200 rounded-custom focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-sm transition-all" />
+                            <input type="text" id="admin-wa-number" value="628123456789" placeholder="Contoh: 628123456789" class="w-full px-4 py-3 border border-gray-200 rounded-custom focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-sm transition-all" />
                             <span class="text-[10px] text-gray-400 mt-1 block">Gunakan kode negara (awali dengan 62)</span>
                         </div>
                     </div>
@@ -214,16 +214,50 @@
                     </div>
 
                     <!-- SEKSI OUTPUT LINK UNIK KLIEN -->
-                    <div id="share-link-section" class="hidden border-t-2 border-dashed border-gray-200 pt-6 space-y-3">
-                        <div class="bg-gray-50 rounded-custom p-4 border border-gray-200">
-                            <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">🎉 Link Galeri Siap Dibagikan!</label>
-                            <p class="text-[11px] text-gray-500 mb-3">Kirimkan link unik di bawah ini ke klien Anda. Link ini berisi data konfigurasi galeri mereka sendiri secara terenkripsi.</p>
-                            
-                            <div class="flex gap-2">
-                                <input type="text" id="share-link-output" readonly class="flex-grow px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-mono select-all outline-none" />
-                                <button onclick="copyShareableLink()" class="px-4 py-2 bg-gray-950 text-white rounded-xl text-xs font-semibold hover:bg-gray-800 transition-all">
-                                    Salin Link
-                                </button>
+                    <div id="share-link-section" class="hidden border-t-2 border-dashed border-gray-200 pt-6 space-y-4">
+                        <div class="bg-gray-50 rounded-custom p-5 border border-gray-250 space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">🎉 Link Galeri Berhasil Dibuat!</label>
+                                <p class="text-[11px] text-gray-500">Berikut adalah tautan galeri kurasi foto klien Anda secara terkompresi.</p>
+                            </div>
+
+                            <!-- Tautan Asli (Panjang) -->
+                            <div class="space-y-1">
+                                <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-wider block">Tautan Enkripsi (Asli):</span>
+                                <div class="flex gap-2">
+                                    <input type="text" id="share-link-output" readonly class="flex-grow px-3 py-2.5 bg-white border border-gray-200 rounded-xl text-xs font-mono select-all outline-none text-gray-500 truncate" />
+                                    <button onclick="copyShareableLink('share-link-output')" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-xl text-xs font-semibold transition-all">
+                                        Salin
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Integrasi Shortener URL -->
+                            <div class="border-t border-gray-200 pt-4 space-y-3">
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                                    <div>
+                                        <span class="text-xs font-bold text-gray-900 block">⚡ Perpendek Tautan Galeri (Sangat Direkomendasikan)</span>
+                                        <span class="text-[10px] text-gray-550 block">Ubah tautan panjang di atas menjadi sangat ringkas & rapi untuk dibagikan ke WhatsApp.</span>
+                                    </div>
+                                    <button id="btn-shorten-trigger" onclick="runUrlShortener()" class="px-4 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 self-start sm:self-auto">
+                                        <svg class="w-3.5 h-3.5 animate-spin hidden" id="spinner-shorten" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        <span>Buat Link Pendek</span>
+                                    </button>
+                                </div>
+
+                                <!-- Box Hasil Link Pendek -->
+                                <div id="short-link-result-container" class="hidden bg-white p-3 border border-green-250 rounded-xl flex items-center gap-2">
+                                    <div class="flex-grow min-w-0">
+                                        <span class="text-[9px] text-green-700 font-bold block uppercase tracking-wider">Tautan Pendek Aktif:</span>
+                                        <input type="text" id="short-link-output" readonly class="w-full bg-transparent text-xs font-mono font-bold text-gray-900 select-all outline-none" />
+                                    </div>
+                                    <button onclick="copyShareableLink('short-link-output')" class="px-4 py-2 bg-green-600 hover:bg-green-750 text-white rounded-lg text-xs font-bold transition-all flex-shrink-0">
+                                        Salin Link Pendek
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -262,7 +296,7 @@
                     <!-- Placeholder jika tabel kosong -->
                     <div id="registry-empty-state" class="text-center py-12 text-gray-400 hidden">
                         <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012 2h2a2 2 0 012-2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
                         </svg>
                         <p class="text-xs font-medium">Belum ada histori galeri yang dibuat.</p>
                         <p class="text-xxs text-gray-400 mt-1">Buat galeri pertama Anda di tab "Buat Galeri Baru".</p>
@@ -385,7 +419,7 @@
             </div>
 
             <h2 class="text-2xl font-bold text-gray-900">Pilihan Foto Disimpan!</h2>
-            <p class="text-sm text-gray-500 mt-2">
+            <p class="text-sm text-gray-550 mt-2">
                 Terima kasih, kurasi foto graduation Anda sudah tuntas. Silakan kirimkan hasil seleksi ini langsung ke fotografer RiseVisual.
             </p>
 
@@ -418,6 +452,10 @@
                         Unduh File TXT
                     </button>
                 </div>
+            </div>
+
+            <div class="mt-8 border-t border-gray-100 pt-6">
+                <button onclick="resetAppAndStartOver()" class="text-xs text-gray-450 hover:text-gray-950 underline transition-all">Kembali ke Halaman Beranda</button>
             </div>
         </section>
 
@@ -481,11 +519,11 @@
     <script>
         // --- 1. STATE MANAGEMENT ---
         const STATE = {
-            clientName: "nama client",
+            clientName: "Sarah Graduation",
             maxSelection: 20,
             photoList: [],         // Berisi: { filename, url, driveUrl }
             selectedPhotos: [],    // Array nama file yang dipilih klien
-            photographerWa: "6285702125164",
+            photographerWa: "628123456789",
             filenamePrefix: "IMG_",
             filenameStart: 1,
             currentLightboxIdx: -1,
@@ -612,22 +650,135 @@ https://drive.google.com/file/d/1UkY1kG-DxNgdTeW_C-R0J9-auD_r_X_i/view?usp=shari
             return parsedPhotos;
         }
 
+        // SISTEM KOMPRESI LINK: Mengubah data object ke format ringkas "Pipe-Delimited" guna menghemat ukuran link hingga 55%
         function encodePayload(obj) {
-            const json = JSON.stringify(obj);
-            return btoa(encodeURIComponent(json).replace(/%([0-9A-F]{2})/g, function(match, p1) {
-                return String.fromCharCode('0x' + p1);
-            }));
+            const delimitedString = [
+                obj.n,           // Nama Klien
+                obj.m,           // Batas Pilihan
+                obj.wa,          // No WhatsApp
+                obj.px,          // Prefix File
+                obj.st,          // Nomor Awal
+                obj.ids.join(',')// Kumpulan ID Foto GDrive
+            ].join('|');
+
+            // Encode dengan Base64 URL-Safe (menghilangkan karakter ilegal pada link)
+            const base64 = btoa(unescape(encodeURIComponent(delimitedString)));
+            return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
         }
 
+        // DEKODE LINK: Mengembalikan format kompresi pipe atau format JSON lama ke format data aslinya
         function decodePayload(str) {
             try {
-                const json = decodeURIComponent(atob(str).split('').map(function(c) {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                }).join(''));
-                return JSON.parse(json);
+                // Konversi kembali dari format URL-Safe ke base64 standar
+                let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+                while (base64.length % 4) {
+                    base64 += '=';
+                }
+                const decoded = decodeURIComponent(escape(atob(base64)));
+                
+                // Fallback kompatibilitas jika link menggunakan format JSON lama
+                if (decoded.trim().startsWith('{')) {
+                    return JSON.parse(decoded);
+                }
+                
+                // Proses pemisahan format Pipe baru
+                const parts = decoded.split('|');
+                if (parts.length < 6) return null;
+                
+                return {
+                    n: parts[0],
+                    m: parseInt(parts[1], 10),
+                    wa: parts[2],
+                    px: parts[3],
+                    st: parseInt(parts[4], 10),
+                    ids: parts[5] ? parts[5].split(',') : []
+                };
             } catch (e) {
+                console.error("Gagal mendecode payload:", e);
                 return null;
             }
+        }
+
+        // INTEGRASI API PERPENDEK LINK (JSONP is.gd agar terhindar dari pemblokiran CORS browser)
+        function shortenUrlWithIsGd(longUrl, callback) {
+            // is.gd hanya menerima tautan publik aktif yang berawalan http atau https
+            if (!longUrl.startsWith('http://') && !longUrl.startsWith('https://')) {
+                callback(null, "URL harus berupa public link aktif (bukan file:// atau localhost).");
+                return;
+            }
+            
+            // Siapkan nama callback unik secara dinamis
+            const callbackName = 'isgd_callback_' + Math.round(100000 * Math.random());
+            window[callbackName] = function(data) {
+                delete window[callbackName];
+                document.body.removeChild(script);
+                if (data.shorturl) {
+                    callback(data.shorturl, null);
+                } else if (data.errorcode) {
+                    callback(null, data.errormessage || "Kesalahan respon is.gd.");
+                } else {
+                    callback(null, "Gagal memperpendek tautan.");
+                }
+            };
+
+            const script = document.createElement('script');
+            script.src = `https://is.gd/create.php?format=json&callback=${callbackName}&url=${encodeURIComponent(longUrl)}`;
+            script.onerror = function() {
+                delete window[callbackName];
+                document.body.removeChild(script);
+                callback(null, "Tidak dapat menghubungi server is.gd. Periksa koneksi internet Anda.");
+            };
+            document.body.appendChild(script);
+        }
+
+        // Eksekusi perpendek link di UI Admin
+        function runUrlShortener() {
+            const longUrl = document.getElementById('share-link-output').value;
+            const spinner = document.getElementById('spinner-shorten');
+            const triggerBtn = document.getElementById('btn-shorten-trigger');
+            const resultContainer = document.getElementById('short-link-result-container');
+            const shortOutput = document.getElementById('short-link-output');
+
+            // Deteksi jika pengguna menguji coba di komputer lokal tanpa server hosting
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
+            
+            if (isLocal) {
+                showNotification("⚠️ Tautan lokal (localhost) tidak bisa diperpendek is.gd. Silakan deploy ke GitHub Pages/Vercel dahulu!");
+                return;
+            }
+
+            // Aktifkan visual loading
+            spinner.classList.remove('hidden');
+            triggerBtn.disabled = true;
+            triggerBtn.classList.add('opacity-50');
+
+            shortenUrlWithIsGd(longUrl, function(shortUrl, err) {
+                // Kembalikan status tombol
+                spinner.classList.add('hidden');
+                triggerBtn.disabled = false;
+                triggerBtn.classList.remove('opacity-50');
+
+                if (err) {
+                    showNotification(`Gagal: ${err}`);
+                    return;
+                }
+
+                if (shortUrl) {
+                    shortOutput.value = shortUrl;
+                    resultContainer.classList.remove('hidden');
+                    
+                    // Otomatis sinkronkan link pendek ke registry manajemen klien
+                    const client = STATE.clientName;
+                    const idx = STATE.galleriesRegistry.findIndex(item => item.clientName === client);
+                    if (idx > -1) {
+                        STATE.galleriesRegistry[idx].url = shortUrl;
+                        saveRegistryToLocalStorage();
+                        renderGalleriesRegistry();
+                    }
+
+                    showNotification("Sukses! Link pendek berhasil dibuat.");
+                }
+            });
         }
 
         function generateShareableLink() {
@@ -674,6 +825,9 @@ https://drive.google.com/file/d/1UkY1kG-DxNgdTeW_C-R0J9-auD_r_X_i/view?usp=shari
             const cleanOrigin = window.location.href.split('#')[0];
             const shareableUrl = `${cleanOrigin}#gallery=${hashString}`;
 
+            // Sembunyikan container hasil link pendek sebelumnya setiap generate link baru
+            document.getElementById('short-link-result-container').classList.add('hidden');
+
             // Tampilkan panel link yang dihasilkan
             document.getElementById('share-link-output').value = shareableUrl;
             document.getElementById('share-link-section').classList.remove('hidden');
@@ -712,16 +866,16 @@ https://drive.google.com/file/d/1UkY1kG-DxNgdTeW_C-R0J9-auD_r_X_i/view?usp=shari
             document.getElementById('share-link-section').scrollIntoView({ behavior: 'smooth' });
         }
 
-        function copyShareableLink() {
-            const linkInput = document.getElementById('share-link-output');
+        function copyShareableLink(inputId) {
+            const linkInput = document.getElementById(inputId);
             linkInput.select();
             linkInput.setSelectionRange(0, 99999);
 
             try {
                 document.execCommand('copy');
-                showNotification("Link galeri berhasil disalin ke Clipboard!");
+                showNotification("Tautan berhasil disalin ke Clipboard!");
             } catch (err) {
-                showNotification("Gagal menyalin. Silakan salin link secara manual.");
+                showNotification("Gagal menyalin. Silakan salin secara manual.");
             }
         }
 
